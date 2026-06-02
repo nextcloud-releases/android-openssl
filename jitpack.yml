@@ -3,10 +3,8 @@ jdk:
 
 before_install:
   - chmod +x build-android.sh
-  - ./build-android.sh || true
-  - ls -la build/install/ || true
-  - ls -la openssl-*.aar || true
-  - mv openssl-*.aar openssl-${VERSION}.aar || true
+  - ./build-android.sh
+  - mv openssl-*.aar openssl-${VERSION}.aar
 
 install:
   - mvn install:install-file
