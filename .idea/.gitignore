@@ -1,0 +1,18 @@
+# Personal / machine-specific IDE state — never commit these
+workspace.xml
+tasks.xml
+usage.statistics.xml
+shelf/
+dictionaries/
+httpRequests/
+dataSources/
+dataSources.local.xml
+dynamic.xml
+uiDesigner.xml
+gradle.xml
+assetWizardSettings.xml
+compiler.xml
+
+# Explicitly keep project-structure files (overrides root *.iml rule)
+!nextcloud-openssl.iml
+!modules.xml
