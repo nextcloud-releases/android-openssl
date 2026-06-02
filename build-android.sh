@@ -16,7 +16,7 @@ OPENSSL_URL="https://github.com/openssl/openssl/archive/refs/tags/${OPENSSL_TAG}
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="${BUILD_DIR:-${SCRIPT_DIR}/build}"
-SRC_DIR="${BUILD_DIR}/src/${OPENSSL_TAG}"
+SRC_DIR="${BUILD_DIR}/src/openssl-${OPENSSL_TAG}"
 INSTALL_DIR="${BUILD_DIR}/install"
 OUTPUT_AAR="${SCRIPT_DIR}/openssl-${OPENSSL_VERSION}.aar"
 
