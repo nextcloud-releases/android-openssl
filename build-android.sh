@@ -75,7 +75,7 @@ for ABI in arm64-v8a x86_64; do
     --prefix="${INSTALL_DIR}/${ABI}" \
     --openssldir="${INSTALL_DIR}/${ABI}/ssl" \
     no-tests no-unit-test no-fuzz-libfuzzer no-fuzz-afl \
-    shared no-static
+    shared
   make -j"$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)"
   make install_sw
   popd >/dev/null
