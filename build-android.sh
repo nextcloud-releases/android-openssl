@@ -35,7 +35,15 @@ if [[ -z "${ANDROID_NDK_ROOT:-}" ]]; then
   NDK_PATH="${ANDROID_HOME}/ndk/${NDK_VERSION}"
   if [[ ! -d "$NDK_PATH" ]]; then
     echo "Installing NDK ${NDK_VERSION}..."
-    yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" "ndk;${NDK_VERSION}" --channel=0
+    if [[ ! -x "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" ]]; then
+      echo "Downloading modern cmdline-tools..."
+      wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+      unzip -q cmdline-tools.zip
+      mkdir -p "${ANDROID_HOME}/cmdline-tools/latest"
+      mv cmdline-tools/* "${ANDROID_HOME}/cmdline-tools/latest/"
+      rm -rf cmdline-tools cmdline-tools.zip
+    fi
+    yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --sdk_root="${ANDROID_HOME}" "ndk;${NDK_VERSION}"
   fi
   ANDROID_NDK_ROOT="$NDK_PATH"
 fi
