@@ -16,7 +16,7 @@ OPENSSL_URL="https://github.com/openssl/openssl/archive/refs/tags/${OPENSSL_TAG}
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="${BUILD_DIR:-${SCRIPT_DIR}/build}"
-SRC_DIR="${BUILD_DIR}/src/${OPENSSL_TAG}"
+SRC_DIR="${BUILD_DIR}/src/openssl-${OPENSSL_TAG}"
 INSTALL_DIR="${BUILD_DIR}/install"
 OUTPUT_AAR="${SCRIPT_DIR}/openssl-${OPENSSL_VERSION}.aar"
 
@@ -35,7 +35,15 @@ if [[ -z "${ANDROID_NDK_ROOT:-}" ]]; then
   NDK_PATH="${ANDROID_HOME}/ndk/${NDK_VERSION}"
   if [[ ! -d "$NDK_PATH" ]]; then
     echo "Installing NDK ${NDK_VERSION}..."
-    yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" "ndk;${NDK_VERSION}" --channel=0
+    if [[ ! -x "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" ]]; then
+      echo "Downloading modern cmdline-tools..."
+      wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+      unzip -q cmdline-tools.zip
+      mkdir -p "${ANDROID_HOME}/cmdline-tools/latest"
+      mv cmdline-tools/* "${ANDROID_HOME}/cmdline-tools/latest/"
+      rm -rf cmdline-tools cmdline-tools.zip
+    fi
+    (set +o pipefail; yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --sdk_root="${ANDROID_HOME}" "ndk;${NDK_VERSION}")
   fi
   ANDROID_NDK_ROOT="$NDK_PATH"
 fi
@@ -75,7 +83,7 @@ for ABI in arm64-v8a x86_64; do
     --prefix="${INSTALL_DIR}/${ABI}" \
     --openssldir="${INSTALL_DIR}/${ABI}/ssl" \
     no-tests no-unit-test no-fuzz-libfuzzer no-fuzz-afl \
-    shared no-static
+    shared
   make -j"$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)"
   make install_sw
   popd >/dev/null

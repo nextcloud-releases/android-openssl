@@ -2,10 +2,9 @@ jdk:
   - openjdk21
 
 before_install:
-  - sdkmanager "ndk;29.0.14206865" --channel=0
-  - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/29.0.14206865
   - chmod +x build-android.sh
-  - OPENSSL_VERSION=${VERSION} ./build-android.sh
+  - ./build-android.sh
+  - mv openssl-*.aar openssl-${VERSION}.aar
 
 install:
   - mvn install:install-file

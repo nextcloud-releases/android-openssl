@@ -39,11 +39,6 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install NDK
-        run: |
-          sdkmanager "ndk;29.0.14206865" --channel=0
-          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/29.0.14206865" >> $GITHUB_ENV
-
       - name: Cache OpenSSL source
         uses: actions/cache@v4
         with:
