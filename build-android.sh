@@ -43,7 +43,7 @@ if [[ -z "${ANDROID_NDK_ROOT:-}" ]]; then
       mv cmdline-tools/* "${ANDROID_HOME}/cmdline-tools/latest/"
       rm -rf cmdline-tools cmdline-tools.zip
     fi
-    yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --sdk_root="${ANDROID_HOME}" "ndk;${NDK_VERSION}"
+    (set +o pipefail; yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --sdk_root="${ANDROID_HOME}" "ndk;${NDK_VERSION}")
   fi
   ANDROID_NDK_ROOT="$NDK_PATH"
 fi
