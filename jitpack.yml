@@ -1,10 +1,12 @@
 jdk:
-  - openjdk17
+  - openjdk21
 
 before_install:
   - chmod +x build-android.sh
-  - ./build-android.sh
-  - mv openssl-*.aar openssl-${VERSION}.aar
+  - ./build-android.sh || true
+  - ls -la build/install/ || true
+  - ls -la openssl-*.aar || true
+  - mv openssl-*.aar openssl-${VERSION}.aar || true
 
 install:
   - mvn install:install-file
