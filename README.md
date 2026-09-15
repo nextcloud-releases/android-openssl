@@ -1,6 +1,22 @@
-## Usage in Android projects
+### 1. Configure the Repository
 
-`settings.gradle`:
+Add the JitPack repository to your root `settings.gradle` or `settings.gradle.kts` file under the `dependencyResolutionManagement` block.
+
+#### `settings.gradle.kts`
+
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://jitpack.io")
+    }
+}
+
+```
+
+#### `settings.gradle`
+
 ```groovy
 dependencyResolutionManagement {
     repositories {
@@ -9,20 +25,43 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
 }
+
 ```
 
-`app/build.gradle`:
-```groovy
+### 2. Add the Dependency
+
+Choose the method that matches your project setup.
+
+#### Version Catalog
+
+Add the following configuration to your `gradle/libs.versions.toml` file:
+
+```toml
+[versions]
+androidOpenssl = "3.5.6"
+
+[libraries]
+android-openssl = { module = "com.github.nextcloud-releases:android-openssl", version.ref = "androidOpenssl" }
+
+```
+
+Then, reference it in your app-level `build.gradle.kts`:
+
+```kotlin
 dependencies {
-    implementation 'com.github.nextcloud-deps:nextcloud-openssl:openssl-3.5.6'
+    implementation(libs.android.openssl)
 }
+
 ```
 
-Replace `openssl-3.5.6` with the desired [release tag](https://github.com/nextcloud-deps/nextcloud-openssl/releases).
+#### `app/build.gradle.kts`
 
----
+```kotlin
+dependencies {
+    implementation("com.github.nextcloud-releases:android-openssl:3.5.6")
+}
 
-## AAR contents
+```
 
 | | |
 |---|---|
@@ -38,30 +77,46 @@ ABIs: **armeabi-v7a**, **arm64-v8a**, **x86**, **x86_64** · Min API: **28** · 
 
 Set `ABIS` to build a subset, e.g. `ABIS="arm64-v8a" ./build-android.sh 3.5.6`.
 
----
-
-## Building the AAR
-
-### On GitHub CI (recommended)
-
-- Go to **Actions → Build Android OpenSSL AAR**
-- Click **Run workflow**
-- Enter the OpenSSL version (e.g. `3.5.6`) and confirm
-- The resulting AAR is attached to the workflow run and published as a GitHub Release on tagged pushes
-
-### Locally
-
-Prerequisites: Android SDK with NDK `29.0.14206865` (auto-installed if `sdkmanager` is in PATH), `curl`, `make`, `python3`.
-
-```bash
-./build-android.sh 3.5.6
 ```
 
-The AAR is written to `openssl-3.5.6.aar`.
+---
+
+## Technical Specifications
+
+### Minimum Requirements
+
+* **Minimum API Level:** 28
+* **Target NDK Version:** 29
+* **Supported ABIs:** `arm64-v8a`, `x86_64`
+
+### AAR Architecture & Contents
+
+The package includes precompiled binaries alongside Prefab metadata to allow direct C/C++ linking in your CMake or ndk-build workflows.
+
+| Artifact Path | Description |
+| --- | --- |
+| `jni/{abi}/libcrypto.so` | Compiled OpenSSL libcrypto binary |
+| `jni/{abi}/libssl.so` | Compiled OpenSSL libssl binary |
+| `prefab/modules/crypto/` | Prefab metadata and headers for native `crypto` linking |
+| `prefab/modules/ssl/` | Prefab metadata and headers for native `ssl` linking |
 
 ---
 
-## License
+## Compilation & Build Instructions
 
-- **Build scripts in this repo:** [Apache-2.0](LICENSE)
-- **OpenSSL** (compiled binaries): [Apache-2.0](https://github.com/openssl/openssl/blob/master/LICENSE.txt)
+### On GitHub CI
+
+1. Navigate to the **Actions** tab of the repository.
+2. Select the **Build Android OpenSSL AAR** workflow.
+3. Click the **Run workflow** dropdown menu.
+4. Input your target OpenSSL version (e.g., `3.5.6`) and trigger the execution.
+
+### Local Environment
+
+Ensure your local machine has `curl`, `make`, and `python3` installed, and that your Android SDK/NDK path is exported.
+
+```bash
+# Execute the build script with the target version string
+./build-android.sh 3.5.6
+
+```
