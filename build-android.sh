@@ -2,13 +2,15 @@
 # SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
 # SPDX-License-Identifier: Apache-2.0
 #
-# Builds OpenSSL for Android (arm64-v8a, x86_64) and packages the result
-# into an AAR file with Prefab support.
+# Builds OpenSSL for every Android ABI and packages the result into an AAR
+# file with Prefab support.
 #
 # Usage:  ./build-android.sh [OPENSSL_VERSION]
 #
 
 set -euo pipefail
+
+ABIS="${ABIS:-armeabi-v7a arm64-v8a x86 x86_64}"
 
 OPENSSL_VERSION="${1:-${OPENSSL_VERSION:-3.5.6}}"
 OPENSSL_TAG="openssl-${OPENSSL_VERSION}"
@@ -65,12 +67,15 @@ if [[ ! -d "${SRC_DIR}" ]]; then
   rm "${BUILD_DIR}/src/${OPENSSL_TAG}.tar.gz"
 fi
 
-for ABI in arm64-v8a x86_64; do
+for ABI in ${ABIS}; do
   echo ""
   echo "-- Building for ${ABI} --"
   case "${ABI}" in
-    arm64-v8a) TARGET="android-arm64" ;;
-    x86_64)    TARGET="android-x86_64" ;;
+    armeabi-v7a) TARGET="android-arm" ;;
+    arm64-v8a)   TARGET="android-arm64" ;;
+    x86)         TARGET="android-x86" ;;
+    x86_64)      TARGET="android-x86_64" ;;
+    *) echo "ERROR: unknown ABI ${ABI}" >&2; exit 1 ;;
   esac
 
   ABI_SRC="${BUILD_DIR}/src/${OPENSSL_TAG}-${ABI}"
@@ -93,6 +98,7 @@ echo ""
 echo "-- Packaging AAR --"
 
 OPENSSL_VERSION="${OPENSSL_VERSION}" \
+ABIS="${ABIS}" \
 MIN_API="${MIN_API}" \
 NDK_MAJOR="$(echo "${NDK_VERSION}" | cut -d. -f1)" \
 INSTALL_DIR="${INSTALL_DIR}" \

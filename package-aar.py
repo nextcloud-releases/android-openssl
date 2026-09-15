@@ -14,9 +14,7 @@ min_api     = int(os.environ["MIN_API"])
 ndk_major   = int(os.environ["NDK_MAJOR"])
 install_dir = os.environ["INSTALL_DIR"]
 output_aar  = os.environ["OUTPUT_AAR"]
-abis        = ["arm64-v8a", "x86_64"]
-
-headers_root = os.path.join(install_dir, abis[0], "include", "openssl")
+abis        = os.environ["ABIS"].split()
 
 with zipfile.ZipFile(output_aar, "w", compression=zipfile.ZIP_DEFLATED) as z:
 
@@ -65,14 +63,16 @@ with zipfile.ZipFile(output_aar, "w", compression=zipfile.ZIP_DEFLATED) as z:
             "android": {}
         }, indent=2))
 
-        # headers (architecture-independent)
-        for fname in sorted(os.listdir(headers_root)):
-            fpath = os.path.join(headers_root, fname)
-            if os.path.isfile(fpath):
-                z.write(fpath, "prefab/modules/{}/include/openssl/{}".format(module, fname))
-
-        # per-ABI .so + abi.json
+        # per-ABI headers, .so and abi.json. configuration.h differs between
+        # 32- and 64-bit ABIs, so headers cannot be shared across ABIs.
         for abi in abis:
+            headers_root = os.path.join(install_dir, abi, "include", "openssl")
+            for fname in sorted(os.listdir(headers_root)):
+                fpath = os.path.join(headers_root, fname)
+                if os.path.isfile(fpath):
+                    z.write(fpath, "prefab/modules/{}/libs/android.{}/include/openssl/{}".format(
+                        module, abi, fname))
+
             z.write(
                 os.path.join(install_dir, abi, "lib", lib_name + ".so"),
                 "prefab/modules/{}/libs/android.{}/{}.so".format(module, abi, lib_name)
