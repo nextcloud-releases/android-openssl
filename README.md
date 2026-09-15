@@ -28,10 +28,15 @@ Replace `openssl-3.5.6` with the desired [release tag](https://github.com/nextcl
 |---|---|
 | `jni/{abi}/libcrypto.so` | OpenSSL libcrypto |
 | `jni/{abi}/libssl.so` | OpenSSL libssl |
-| `prefab/modules/crypto/` | Prefab metadata + headers for NDK linking |
-| `prefab/modules/ssl/` | Prefab metadata + headers for NDK linking |
+| `prefab/modules/crypto/libs/android.{abi}/` | Prefab metadata + headers for NDK linking |
+| `prefab/modules/ssl/libs/android.{abi}/` | Prefab metadata + headers for NDK linking |
 
-ABIs: **arm64-v8a**, **x86_64** · Min API: **28** · NDK: **29**
+Headers are shipped per ABI because OpenSSL's generated `configuration.h` differs
+between 32- and 64-bit targets.
+
+ABIs: **armeabi-v7a**, **arm64-v8a**, **x86**, **x86_64** · Min API: **28** · NDK: **29**
+
+Set `ABIS` to build a subset, e.g. `ABIS="arm64-v8a" ./build-android.sh 3.5.6`.
 
 ---
 
